@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quick Studio — Grok Imagine test bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14120f;
+    --panel: #1c1a16;
+    --panel-border: #33302a;
+    --text: #f2ede4;
+    --text-muted: #a89f8f;
+    --accent: #cba25e;
+    --accent-dim: #8a6f3f;
+    --danger: #d97a6c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(circle at top, #201d18, var(--bg) 60%);
+    color: var(--text);
+    font-family: "Inter", sans-serif;
+    min-height: 100vh;
+    padding: 48px 24px 80px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 40px; }
+  h1 {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 2.4rem;
+    margin: 0 0 8px;
+    letter-spacing: 0.01em;
+  }
+  header p { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
+
+  .hero {
+    text-align: center;
+    padding: 8px 0 44px;
+    --mood: #cba25e;
+  }
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin: 0 0 14px;
+  }
+  .hero h2 {
+    font-family: "Fraunces", serif;
+    font-weight: 500;
+    font-size: clamp(1.6rem, 4.2vw, 2.6rem);
+    line-height: 1.2;
+    margin: 0 0 36px;
+  }
+  .style-word {
+    color: var(--mood);
+    transition: opacity 0.3s ease, color 0.6s ease;
+    display: inline-block;
+  }
+  .stage {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    margin: 0 auto 36px;
+  }
+  .orb, .orb::before, .orb::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+  }
+  .orb {
+    inset: 15px;
+    background: radial-gradient(circle at 38% 32%, #fff, var(--mood) 68%);
+    filter: blur(14px);
+    opacity: 0.92;
+    animation: breathe 4s ease-in-out infinite;
+    transition: background 0.6s ease;
+  }
+  .orb::before {
+    inset: -18px;
+    background: radial-gradient(circle at 62% 62%, var(--mood), transparent 70%);
+    filter: blur(22px);
+    opacity: 0.55;
+    animation: drift 7s ease-in-out infinite;
+    transition: background 0.6s ease;
+  }
+  .orb::after {
+    inset: 34px 14px 14px 34px;
+    background: radial-gradient(circle at 30% 30%, #fff, transparent 65%);
+    filter: blur(10px);
+    opacity: 0.45;
+    animation: drift 5s ease-in-out infinite reverse;
+  }
+  @keyframes drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(5px, -7px) scale(1.05); }
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.035); }
+  }
+  .pipeline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .pipe-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    transition: color 0.4s ease;
+  }
+  .pipe-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--panel-border);
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+  }
+  .pipe-step.active { color: var(--text); }
+  .pipe-step.active .pipe-dot {
+    background: var(--mood);
+    box-shadow: 0 0 12px var(--mood);
+  }
+  .pipe-line {
+    width: 56px;
+    height: 2px;
+    margin: 0 8px 22px;
+    background-image: repeating-linear-gradient(90deg, var(--mood) 0 6px, transparent 6px 14px);
+    background-size: 20px 2px;
+    opacity: 0.5;
+    animation: flow 1s linear infinite;
+  }
+  @keyframes flow { to { background-position: -20px 0; } }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 28px;
+  }
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  input[type="text"] {
+    width: 100%;
+    background: #0f0e0c;
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+  }
+  input[type="text"]:focus { outline: none; border-color: var(--accent); }
+  select { width: 100%; }
+  .prompt-used {
+    margin-top: 14px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    border-top: 1px solid var(--panel-border);
+    padding-top: 12px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 90px;
+    resize: vertical;
+    background: #0f0e0c;
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 14px;
+  }
+  textarea:focus { outline: none; border-color: var(--accent); }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  select {
+    background: #0f0e0c;
+    color: var(--text);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+  }
+  button.primary {
+    background: var(--accent);
+    color: #221a0c;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 22px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button.primary:hover { background: #ddb670; }
+  button.primary:disabled { background: var(--accent-dim); cursor: wait; }
+  button.ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  button.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .status { margin-top: 14px; font-size: 0.85rem; color: var(--text-muted); min-height: 1.2em; }
+  .status.error { color: var(--danger); }
+  .result { margin-top: 28px; }
+  .result img {
+    width: 100%;
+    border-radius: 14px;
+    border: 1px solid var(--panel-border);
+    display: block;
+  }
+  .result-actions { margin-top: 10px; display: flex; gap: 10px; }
+  .gallery {
+    margin-top: 36px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 10px;
+  }
+  .gallery img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--panel-border);
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.15s;
+  }
+  .gallery img:hover { opacity: 1; }
+  .section-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 0 0 12px;
+  }
+  a.download-link { color: var(--accent); font-size: 0.85rem; text-decoration: none; align-self: center; }
+  a.download-link:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Quick Studio</h1>
+    <p>A focused test bench for the Grok Imagine call behind Vela — not the full app, just the generation loop.</p>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">Vela — human character studio</p>
+    <h2>Building a <span id="styleWord" class="style-word">Editorial</span> character</h2>
+
+    <div class="stage">
+      <div class="orb"></div>
+    </div>
+
+    <div class="pipeline">
+      <div class="pipe-step" data-step="0"><span class="pipe-dot"></span><span>Describe</span></div>
+      <div class="pipe-line"></div>
+      <div class="pipe-step" data-step="1"><span class="pipe-dot"></span><span>Generate</span></div>
+      <div class="pipe-line"></div>
+      <div class="pipe-step" data-step="2"><span class="pipe-dot"></span><span>Refine</span></div>
+    </div>
+  </section>
+
+  <div class="panel">
+    <p class="section-label">Same fields Vela's Create Human uses</p>
+
+    <div class="field-grid">
+      <div>
+        <label>Presentation</label>
+        <select id="presentation">
+          <option>Woman</option>
+          <option>Man</option>
+          <option>Person</option>
+        </select>
+      </div>
+      <div>
+        <label>Age range</label>
+        <select id="age">
+          <option>20s</option>
+          <option>30s</option>
+          <option>40s</option>
+          <option>50s</option>
+        </select>
+      </div>
+      <div>
+        <label>Ancestry / look</label>
+        <input id="ancestry" type="text" placeholder="e.g. South Asian" value="South Asian" />
+      </div>
+    </div>
+
+    <div class="field-grid">
+      <div>
+        <label>Style</label>
+        <select id="style">
+          <option value="photoreal">Photoreal</option>
+          <option value="cinematic">Cinematic</option>
+          <option value="digital3d">Digital 3D human</option>
+          <option value="editorial">Editorial</option>
+          <option value="headshot">Headshot</option>
+          <option value="linkedin">LinkedIn</option>
+        </select>
+      </div>
+      <div>
+        <label>Setting</label>
+        <select id="setting">
+          <option value="studio">Studio</option>
+          <option value="window">Window light</option>
+          <option value="golden">Golden hour</option>
+          <option value="night">Night city</option>
+          <option value="gallery">Gallery</option>
+        </select>
+      </div>
+      <div>
+        <label>Aspect</label>
+        <select id="aspect">
+          <option value="1:1">Square</option>
+          <option value="4:3">Landscape</option>
+          <option value="3:4" selected>Portrait</option>
+          <option value="16:9">Wide</option>
+          <option value="9:16">Tall</option>
+        </select>
+      </div>
+    </div>
+
+    <label>Extra direction (optional)</label>
+    <textarea id="details" placeholder="Anything specific — expression, wardrobe detail, mood..."></textarea>
+
+    <div class="row">
+      <button class="primary" id="generate">Generate</button>
+      <button class="ghost" id="surprise">Surprise me</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="result" id="result" style="display:none">
+      <img id="resultImg" alt="Generated result" />
+      <div class="result-actions">
+        <a class="download-link" id="downloadLink" download="quick-studio.png">Download full size</a>
+      </div>
+      <p class="prompt-used" id="promptUsed"></p>
+    </div>
+  </div>
+
+  <div id="gallerySection" style="display:none">
+    <p class="section-label" style="margin-top:32px">This session</p>
+    <div class="gallery" id="gallery"></div>
+  </div>
+</div>
+
+<script>
+  const ancestries = ["South Asian", "East Asian", "West African", "Scandinavian", "Mediterranean", "Latin American"];
+  const styles = ["photoreal", "cinematic", "digital3d", "editorial", "headshot", "linkedin"];
+  const settings = ["studio", "window", "golden", "night", "gallery"];
+  const ages = ["20s", "30s", "40s", "50s"];
+  const presentations = ["Woman", "Man", "Person"];
+
+  const presentationEl = document.getElementById("presentation");
+  const ageEl = document.getElementById("age");
+  const ancestryEl = document.getElementById("ancestry");
+  const styleEl = document.getElementById("style");
+  const settingEl = document.getElementById("setting");
+  const detailsEl = document.getElementById("details");
+  const aspectEl = document.getElementById("aspect");
+  const statusEl = document.getElementById("status");
+  const generateBtn = document.getElementById("generate");
+  const surpriseBtn = document.getElementById("surprise");
+  const resultEl = document.getElementById("result");
+  const resultImg = document.getElementById("resultImg");
+  const downloadLink = document.getElementById("downloadLink");
+  const promptUsedEl = document.getElementById("promptUsed");
+  const gallerySection = document.getElementById("gallerySection");
+  const galleryEl = document.getElementById("gallery");
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  const heroMoments = [
+    { word: "Editorial", color: "#cba25e" },
+    { word: "Cinematic", color: "#8fa6c9" },
+    { word: "Golden hour", color: "#e0a86a" },
+    { word: "Studio clean", color: "#b9c9c2" },
+    { word: "Night city", color: "#9a8ee0" },
+  ];
+  const heroEl = document.querySelector(".hero");
+  const styleWordEl = document.getElementById("styleWord");
+  let momentIndex = 0;
+  function nextMoment() {
+    const m = heroMoments[momentIndex % heroMoments.length];
+    momentIndex++;
+    styleWordEl.style.opacity = 0;
+    setTimeout(() => {
+      styleWordEl.textContent = m.word;
+      heroEl.style.setProperty("--mood", m.color);
+      styleWordEl.style.opacity = 1;
+    }, 280);
+  }
+  nextMoment();
+  setInterval(nextMoment, 2800);
+
+  const pipeSteps = document.querySelectorAll(".pipe-step");
+  let pipeIndex = 0;
+  function nextPipeStep() {
+    pipeSteps.forEach((el) => el.classList.remove("active"));
+    pipeSteps[pipeIndex % pipeSteps.length].classList.add("active");
+    pipeIndex++;
+  }
+  nextPipeStep();
+  setInterval(nextPipeStep, 1400);
+
+  surpriseBtn.addEventListener("click", () => {
+    presentationEl.value = pick(presentations);
+    ageEl.value = pick(ages);
+    ancestryEl.value = pick(ancestries);
+    styleEl.value = pick(styles);
+    settingEl.value = pick(settings);
+  });
+
+  function addToGallery(dataUrl) {
+    gallerySection.style.display = "block";
+    const img = document.createElement("img");
+    img.src = dataUrl;
+    img.addEventListener("click", () => showResult(dataUrl));
+    galleryEl.prepend(img);
+  }
+
+  function showResult(dataUrl, promptUsed) {
+    resultImg.src = dataUrl;
+    downloadLink.href = dataUrl;
+    resultEl.style.display = "block";
+    promptUsedEl.textContent = promptUsed ? "Prompt sent: " + promptUsed : "";
+  }
+
+  async function generate() {
+    if (!ancestryEl.value.trim()) {
+      statusEl.textContent = "Fill in ancestry / look first.";
+      statusEl.className = "status error";
+      return;
+    }
+
+    generateBtn.disabled = true;
+    statusEl.className = "status";
+    statusEl.textContent = "Generating...";
+
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          presentation: presentationEl.value,
+          age: ageEl.value,
+          ancestry: ancestryEl.value.trim(),
+          style: styleEl.value,
+          setting: settingEl.value,
+          details: detailsEl.value,
+          aspectRatio: aspectEl.value,
+        }),
+      });
+      const json = await res.json();
+
+      if (!json.ok) {
+        statusEl.className = "status error";
+        statusEl.textContent = json.error || "Generation failed.";
+        return;
+      }
+
+      statusEl.textContent = "Done.";
+      showResult(json.image, json.promptUsed);
+      addToGallery(json.image);
+    } catch (err) {
+      statusEl.className = "status error";
+      statusEl.textContent = "Could not reach the server: " + err.message;
+    } finally {
+      generateBtn.disabled = false;
+    }
+  }
+
+  generateBtn.addEventListener("click", generate);
+</script>
+</body>
+</html>
